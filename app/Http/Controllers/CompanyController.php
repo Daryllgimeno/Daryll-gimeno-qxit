@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Http\Requests\CompanyFormRequest;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class CompanyController extends Controller
@@ -14,7 +16,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $company=Company::paginate(10);
+        $companies=Company::paginate(10);
         return view('companies.index', compact('companies'));
     }
 
@@ -29,18 +31,27 @@ class CompanyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CompanyFormRequest $request)
-    {
-        //
-        company::create($request->validated());
-        return redirect()->routes('companies.index')->with('success', 'Company created sucessfully');
+   public function store(CompanyFormRequest $request)
+{
+     dd($request->all()); 
+
+    if ($request->hasFile('logo')) {
+        $path = $request->file('logo')->store('logos', 'public');
+        $data['logo'] = $path;
     }
+
+    Company::create($data);
+
+    return redirect()->route('companies.index')
+        ->with('success', 'Company created successfully!');
+}
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
+        $company = Company::findOrFail($id);
         return view('companies.show', compact('company'));
     }
 
@@ -49,19 +60,32 @@ class CompanyController extends Controller
      */
     public function edit(string $id)
     {
-        return view('companies.edit',compact('companies'));
+        $company = Company::findOrFail($id);
+   return view('companies.edit', compact('company'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(CompanyFormRequest $request, string $id)
-    {
-        $company = Company::findOrFail($id);
-        $company->update($request->validated());
+  public function update(CompanyFormRequest $request, string $id)
+{
+    $company = Company::findOrFail($id);
+    $data = $request->validated();
 
-        return redirect()->route('companies.index')->with('success', 'Company updated successfully');
+    if ($request->hasFile('logo')) {
+        if ($company->logo && Storage::disk('public')->exists($company->logo)) {
+            Storage::disk('public')->delete($company->logo);
+        }
+
+        $path = $request->file('logo')->store('logos', 'public');
+        $data['logo'] = $path;
     }
+
+    $company->update($data);
+
+    return redirect()->route('companies.index')
+        ->with('success', 'Company updated successfully!');
+}
 
     /**
      * Remove the specified resource from storage.

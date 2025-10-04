@@ -33,7 +33,7 @@ class CompanyController extends Controller
      */
    public function store(CompanyFormRequest $request)
 {
-     dd($request->all()); 
+    $data = $request->validated();
 
     if ($request->hasFile('logo')) {
         $path = $request->file('logo')->store('logos', 'public');

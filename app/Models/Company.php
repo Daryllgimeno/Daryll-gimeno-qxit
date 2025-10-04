@@ -13,7 +13,7 @@ class Company extends Model
         'name',
         'email',
         'logo',
-        'website'
+        'website',
 
 
 

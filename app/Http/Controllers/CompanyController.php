@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Http\Requests\CompanyFormRequest;
+
 
 class CompanyController extends Controller
 {
@@ -27,7 +29,7 @@ class CompanyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CompanyFormRequest $request)
     {
         //
         company::create($request->validated());
@@ -53,7 +55,7 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CompanyFormRequest $request, string $id)
     {
         $company = Company::findOrFail($id);
         $company->update($request->validated());

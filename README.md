@@ -43,3 +43,8 @@
 ```bash
 git clone [repository-url]
 cd [project-folder]
+
+2. to seed
+type in terminal 
+
+php artisan migrate:fresh --seed

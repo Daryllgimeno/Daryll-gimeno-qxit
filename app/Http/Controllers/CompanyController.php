@@ -67,16 +67,24 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-  public function update(CompanyFormRequest $request, string $id)
+public function update(CompanyFormRequest $request, string $id)
 {
     $company = Company::findOrFail($id);
     $data = $request->validated();
 
+   
+    if ($request->has('remove_logo')) {
+        if ($company->logo && Storage::disk('public')->exists($company->logo)) {
+            Storage::disk('public')->delete($company->logo);
+        }
+        $data['logo'] = null; 
+    }
+
+   
     if ($request->hasFile('logo')) {
         if ($company->logo && Storage::disk('public')->exists($company->logo)) {
             Storage::disk('public')->delete($company->logo);
         }
-
         $path = $request->file('logo')->store('logos', 'public');
         $data['logo'] = $path;
     }
@@ -87,13 +95,22 @@ class CompanyController extends Controller
         ->with('success', 'Company updated successfully!');
 }
 
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $company = Company::findOrFail($id);
-        $company->delete();
-        return redirect()->route('companies.index')->with('success','company deleted successfully');
+   public function destroy(string $id)
+{
+    $company = Company::findOrFail($id);
+    //delete also the logo in the storage
+    if ($company->logo && Storage::disk('public')->exists($company->logo)) {
+        Storage::disk('public')->delete($company->logo);
     }
+
+    $company->delete();
+
+    return redirect()->route('companies.index')
+        ->with('success', 'Company deleted successfully');
+}
+
 }

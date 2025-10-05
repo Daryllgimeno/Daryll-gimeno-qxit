@@ -1,25 +1,40 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-        <h2>Employees of {{ $company->name }}</h2>
-<a href="{{ route('companies.employees.create', $company->id) }}" class="btn btn-success">Add Employee</a>
+<div class="container mt-5">
 
-    </div>
+<div class="d-flex justify-content-start align-items-center mb-4 gap-2">
+    @isset($company)
+        <a href="{{ route('companies.employees.create', $company->id) }}" class="btn btn-danger shadow-sm">
+            <i class="bi bi-plus-circle"></i> Add Employee
+        </a>
+        <a href="{{ route('companies.index') }}" class="btn btn-warning shadow-sm">
+            <i class="bi bi-building"></i> Back to Companies
+        </a>
+    @else
+        <a href="{{ route('employees.create') }}" class="btn btn-danger shadow-sm">
+            <i class="bi bi-plus-circle"></i> Add Employee
+        </a>
+        <a href="{{ route('companies.index') }}" class="btn btn-warning shadow-sm">
+            <i class="bi bi-building"></i> Back to Companies
+        </a>
+    @endisset
+</div>
+
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="card mt-3">
-        <div class="card-header">
+    <div class="card shadow">
+        <div class="card-header bg-light">
             Employee List
         </div>
         <div class="card-body p-0">
-            <table class="table table-bordered mb-0">
-                <thead class="table-light">
+            <table class="table table-hover mb-0">
+                <thead>
                     <tr>
+                        <th>No.</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Company</th>
@@ -31,26 +46,27 @@
                 <tbody>
                     @forelse($employees as $employee)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $employee->first_name }}</td>
                             <td>{{ $employee->last_name }}</td>
                             <td>{{ $employee->company->name ?? '-' }}</td>
-                            <td>{{ $employee->email ?? '-' }}</td>
-                            <td>{{ $employee->phone ?? '-' }}</td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                           
-                                    <a href="{{ route('companies.employees.edit', [$company->id, $employee->id]) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('companies.employees.destroy', [$company->id, $employee->id]) }}" method="POST" onsubmit="return confirm('Delete this employee?')">
+                            <td>{{ $employee->email }}</td>
+                            <td>{{ $employee->phone }}</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-warning">Edit</a>
+
+                                    <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this employee?')">Delete</button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">No employees found.</td>
+                            <td colspan="7" class="text-center">No employees found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -61,5 +77,6 @@
     <div class="mt-3">
         {{ $employees->links() }}
     </div>
+
 </div>
 @endsection

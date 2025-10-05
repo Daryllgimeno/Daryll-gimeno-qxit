@@ -34,6 +34,10 @@
                     <label>Logo</label><br>
                     @if ($company->logo && file_exists(public_path('storage/' . $company->logo)))
                         <img src="{{ asset('storage/' . $company->logo) }}" width="100" height="100" class="rounded border mb-2" alt="Logo"><br>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="remove_logo" class="form-check-input" id="removeLogo">
+                            <label class="form-check-label" for="removeLogo">Remove Logo</label>
+                        </div>
                     @endif
                     <input type="file" name="logo" class="form-control">
                     @error('logo') <div class="text-danger">{{ $message }}</div> @enderror
